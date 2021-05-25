@@ -1,18 +1,22 @@
-"""PayPal API Client."""  # noqa: WPS226
+"""BuildWith API Client."""  # noqa: WPS226
 # -*- coding: utf-8 -*-
 
 import logging
-from typing import Callable, List, Generator
-from tap_buildwith.cleaners import CLEANERS
-from dateutil.rrule import DAILY, rrule
 from datetime import date, datetime, timedelta
+from typing import Callable, Generator, List
+
+import httpx
+import singer
+from dateutil.rrule import DAILY, rrule
+
+from tap_buildwith.cleaners import CLEANERS
 
 API_SCHEME: str = 'https://'
 API_BASE_URL: str = 'api.builtwith.com'
 API_TRENDS: str = '/trends/v6/api.json?'
-API_KEY: str = '?KEY=:key:'
-API_TECH: str = '?TECH=:tech:'
-API_DATE: str = '?DATE=:date:'
+API_KEY: str = 'KEY=:key:'
+API_TECH: str = '&TECH=:tech:'
+API_DATE: str = '&DATE=:date:'
 
 
 class Buildwith(object):  # noqa: WPS230
@@ -28,6 +32,8 @@ class Buildwith(object):  # noqa: WPS230
             api_key {str} -- Buildwith API key
         """
         self.api_key: str = api_key
+        self.logger: logging.Logger = singer.get_logger()
+        self.client: httpx.Client = httpx.Client(http2=True)
 
     def trends(
         self,
@@ -51,7 +57,7 @@ class Buildwith(object):  # noqa: WPS230
 
         self._set_api_key()
 
-        for date_day in self._start_days_till_now(start_date_input):
+        for date_day in self._start_days_till_yesterday(start_date_input):
 
             # Replace placeholder in reports path
             from_to_date: str = API_DATE.replace(
@@ -65,9 +71,26 @@ class Buildwith(object):  # noqa: WPS230
             )
             url: str = (
                 f'{API_SCHEME}{API_BASE_URL}{API_TRENDS}'
-                f'{from_to_date}{tech}{self.api_key_url}'
+                f'{self.api_key_url}{from_to_date}{tech}'
             )
             
+            # Make a call to the Buildwith API
+            response: httpx._models.Response = self.client.get(
+                url
+            )
+
+            # Raise error on 4xx and 5xxx
+            response.raise_for_status()
+
+            # Create dictionary from response
+            response_data: dict = response.json()
+
+            self.logger.info(
+                f'{response_data}'
+            )
+
+            # Yield Cleaned results
+            yield cleaner(date_day, response_data)
 
     def _set_api_key(
         self,
@@ -79,7 +102,7 @@ class Buildwith(object):  # noqa: WPS230
         )
         self.api_key_url = api_key_url
 
-    def _start_days_till_now(
+    def _start_days_till_yesterday(
         self,
         start_date: str,
     ) -> Generator:
@@ -99,11 +122,14 @@ class Buildwith(object):  # noqa: WPS230
         # Setup start period
         period: date = date(year, month, day)
 
+        # Calculate yesterday's date
+        yesterday = datetime.utcnow() - datetime.timedelta(days=1)
+
         # Setup itterator
         dates: rrule = rrule(
             freq=DAILY,
             dtstart=period,
-            until=datetime.utcnow(),
+            until=yesterday,
         )
 
         # Yield dates in YYYY-MM-DD format

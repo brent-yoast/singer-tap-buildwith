@@ -94,7 +94,7 @@ def clean_trends(
     date_day: str,
     response_data: dict,
 ) -> dict:
-    """Clean postmark bounces response_data.
+    """Clean buildwith bounces response_data.
 
     Arguments:
         response_data {dict} -- input response_data
