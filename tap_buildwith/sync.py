@@ -7,15 +7,15 @@ from typing import Callable, Optional
 import singer
 from singer.catalog import Catalog, CatalogEntry
 
-from tap_postmark import tools
-from tap_postmark.postmark import Postmark
-from tap_postmark.streams import STREAMS
+from tap_buildwith import tools
+from tap_buildwith.buildwith import Buildwith
+from tap_buildwith.streams import STREAMS
 
 LOGGER: logging.RootLogger = singer.get_logger()
 
 
 def sync(
-    postmark: Postmark,
+    buildwith: Buildwith,
     state: dict,
     catalog: Catalog,
     start_date: str,
@@ -23,7 +23,7 @@ def sync(
     """Sync data from tap source.
 
     Arguments:
-        postmark {Postmark} -- Postmark client
+        buildwith {Buildwith} -- Buildwith client
         state {dict} -- Tap state
         catalog {Catalog} -- Stream catalog
         start_date {str} -- Start date
@@ -58,7 +58,7 @@ def sync(
 
         # Every stream has a corresponding method in the PayPal object e.g.:
         # The stream: paypal_transactions will call: paypal.paypal_transactions
-        tap_data: Callable = getattr(postmark, stream.tap_stream_id)
+        tap_data: Callable = getattr(buildwith, stream.tap_stream_id)
 
         # The tap_data method yields rows of data from the API
         # The state of the stream is used as kwargs for the method

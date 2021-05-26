@@ -67,13 +67,15 @@ class Buildwith(object):  # noqa: WPS230
             # Replace placeholder in reports path
             tech: str = API_TECH.replace(
                 ':tech:',
-                date_day,
+                'Yoast-WordPress-SEO-Plugin',
             )
             url: str = (
                 f'{API_SCHEME}{API_BASE_URL}{API_TRENDS}'
                 f'{self.api_key_url}{from_to_date}{tech}'
             )
             
+            print(url)
+
             # Make a call to the Buildwith API
             response: httpx._models.Response = self.client.get(
                 url
@@ -123,7 +125,7 @@ class Buildwith(object):  # noqa: WPS230
         period: date = date(year, month, day)
 
         # Calculate yesterday's date
-        yesterday = datetime.utcnow() - datetime.timedelta(days=1)
+        yesterday = datetime.utcnow() - timedelta(days=1)
 
         # Setup itterator
         dates: rrule = rrule(

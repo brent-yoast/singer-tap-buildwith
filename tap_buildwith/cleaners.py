@@ -1,11 +1,12 @@
-"""Postmark cleaners."""
+"""Buildwith cleaners."""
 # -*- coding: utf-8 -*-
 
 import collections
 from types import MappingProxyType
-from tap_postmark.streams import STREAMS
+from tap_buildwith.streams import STREAMS
 from typing import Any, Optional
 
+import pandas as pd 
 
 class ConvertionError(ValueError):
     """Failed to convert value."""
@@ -103,29 +104,14 @@ def clean_trends(
         dict -- cleaned response_data
     """
     # Get the mapping from the STREAMS
-    mapping: Optional[dict] = STREAMS['stats_outbound_bounces'].get(
+    mapping: Optional[dict] = STREAMS['trends'].get(
         'mapping',
     )
 
-    # Create Unique ID
-    id = int(date_day.replace('-', ''))
+    df = pd.json_normalize(response_data, sep='_')
+    
+    print(df)
 
-    # Create new cleaned Dict
-    cleaned_data: dict = {
-        'id': id,
-        'date': date_day,
-        'AutoResponder': response_data.get('AutoResponder'),
-        'Blocked': response_data.get('Blocked'),
-        'DnsError': response_data.get('DnsError'),
-        'HardBounce': response_data.get('HardBounce'),
-        'SMTPApiError': response_data.get('SMTPApiError'),
-        'SoftBounce': response_data.get('SoftBounce'),
-        'SpamNotification': response_data.get('SpamNotification'),
-        'Transient': response_data.get('Transient'),
-        'Unknown': response_data.get('Unknown'),
-    }
-    response_data.pop('Days', None)
-    return clean_row(cleaned_data, mapping)
 
 
 # Collect all cleaners

@@ -253,7 +253,7 @@ def date_parser(input_date: str) -> str:
 
 # Streams metadata
 STREAMS: MappingProxyType = MappingProxyType({
-    'messages_outbound': {
+    'trends': {
         'key_properties': 'id',
         'replication_method': 'INCREMENTAL',
         'replication_key': 'date',

@@ -13,6 +13,8 @@ setup(
         # NB: Pin these to a more specific version for tap reliability
         "singer-python",
         "requests",
+        "httpx",
+        "httpx[http2]",
     ],
     entry_points="""
     [console_scripts]
