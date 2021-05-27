@@ -74,9 +74,10 @@ def create_bookmark(stream_name: str, bookmark_value: str) -> str:
     if stream_name in {
         'trends',
     }:
+        
         # Return tomorrow's date
         tomorrow: date = datetime.strptime(
-            bookmark_value,
+            bookmark_value.replace('T00:00:00', ''),
             '%Y-%m-%d',
         ).date() + timedelta(days=1)
         return tomorrow.isoformat()

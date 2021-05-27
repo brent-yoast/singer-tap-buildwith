@@ -85,6 +85,7 @@ ENV/
 env.sh
 config.json
 .autoenv.zsh
+target-json
 
 rsa-key
 tags

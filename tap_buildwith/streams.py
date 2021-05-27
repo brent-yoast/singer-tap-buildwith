@@ -254,273 +254,29 @@ def date_parser(input_date: str) -> str:
 # Streams metadata
 STREAMS: MappingProxyType = MappingProxyType({
     'trends': {
-        'key_properties': 'id',
+        'key_properties': 'date',
         'replication_method': 'INCREMENTAL',
         'replication_key': 'date',
         'bookmark': 'start_date',
         'mapping': {
             'date': {
-                'map': 'date', 'null': False,
+                'map': 'date', 'type': date_parser, 'null': False,
             },
-            'Bcc': {
-                'map': 'bcc', 'null': True,
+            'technology' : {
+                'map': 'technology', 'null': False,
             },
-            'Cc': {
-                'map': 'cc', 'null': True,
+            'ten_k': {
+                'map': 'ten_k', 'type': int, 'null': True,
             },
-            'From': {
-                'map': 'from', 'null': False,
+            'hundred_k': {
+                'map': 'hundred_k', 'type': int, 'null': True,
             },
-            'MessageID': {
-                'map': 'message_id', 'null': False,
+            'million': {
+                'map': 'million', 'type': int, 'null': True,
             },
-            'MessageStream': {
-                'map': 'message_stream', 'null': False,
-            },
-            'ReceivedAt': {
-                'map': 'received_at', 'null': False,
-            },
-            'Recipients': {
-                'map': 'recipients', 'null': False,
-            },
-            'Status': {
-                'map': 'status', 'null': False,
-            },
-            'To': {
-                'map': 'to', 'null': True,
-            },
-            'TrackLinks': {
-                'map': 'track_links', 'null': True,
-            },
-            'TrackOpens': {
-                'map': 'track_opens', 'null': True,
+            'live': {
+                'map': 'live', 'type': int, 'null': True,
             },
         }
-    },
-    'messages_opens': {
-        'key_properties': 'id',
-        'replication_method': 'INCREMENTAL',
-        'replication_key': 'date',
-        'bookmark': 'start_date',
-        'mapping': {
-            'date': {
-                'map': 'date', 'null': False,
-            },
-            'FirstOpen': {
-                'map': 'first_open', 'null': True,
-            },
-            'Client_Name': {
-                'map': 'client_name', 'null': True,
-            },
-            'Client_Company': {
-                'map': 'client_company', 'null': True,
-            },
-            'Client_Family': {
-                'map': 'client_family', 'null': True,
-            },
-            'OS_Name': {
-                'map': 'os_name', 'null': True,
-            },
-            'OS_Company': {
-                'map': 'os_company', 'null': True,
-            },
-            'OS_Family': {
-                'map': 'os_family', 'null': True,
-            },
-            'Platform': {
-                'map': 'platform', 'null': True,
-            },
-            'UserAgent': {
-                'map': 'user_agent', 'null': True,
-            },
-            'Geo_CountryISOCode': {
-                'map': 'geo_countryisocode', 'null': True,
-            },
-            'Geo_Country': {
-                'map': 'geo_country', 'null': True,
-            },
-            'Geo_RegionISOCode': {
-                'map': 'geo_regionisocode', 'null': True,
-            },
-            'Geo_Region': {
-                'map': 'geo_region', 'null': True,
-            },
-            'Geo_City': {
-                'map': 'geo_city', 'null': True,
-            },
-            'Geo_Zip': {
-                'map': 'geo_zip', 'null': True,
-            },
-            'Geo_Coords': {
-                'map': 'geo_coords', 'null': True,
-            },
-            'Geo_IP': {
-                'map': 'geo_ip', 'null': True,
-            },
-            'MessageID': {
-                'map': 'message_id', 'null': False,
-            },
-            'MessageStream': {
-                'map': 'message_stream', 'null': False,
-            },
-            'ReceivedAt': {
-                'map': 'received_at', 'null': False,
-            },
-            'Tag': {
-                'map': 'tag', 'null': True,
-            },
-            'Recipient': {
-                'map': 'recipient', 'null': False,
-            },
-        }
-    },
-    'stats_outbound_bounces': {
-        'key_properties': 'id',
-        'replication_method': 'INCREMENTAL',
-        'replication_key': 'date',
-        'bookmark': 'start_date',
-        'mapping': {
-            'id': {
-                'map': 'id', 'type': int, 'null': False,
-            },
-            'date': {
-                'map': 'date',
-            },
-            'AutoResponder': {
-                'map': 'autoresponder', 'type': int, 'null': True,
-            },
-            'Blocked': {
-                'map': 'blocked', 'type': int, 'null': True,
-            },
-            'DnsError': {
-                'map': 'dnserror', 'type': int, 'null': True,
-            },
-            'HardBounce': {
-                'map': 'hardbounce', 'type': int, 'null': True,
-            },
-            'SMTPApiError': {
-                'map': 'smtp_api_error', 'type': int, 'null': True,
-            },
-            'SoftBounce': {
-                'map': 'softbounce', 'type': int, 'null': True,
-            },
-            'SpamNotification': {
-                'map': 'spamnotification', 'type': int, 'null': True,
-            },
-            'Transient': {
-                'map': 'transient', 'type': int, 'null': True,
-            },
-            'Unknown': {
-                'map': 'unknown', 'type': int, 'null': True,
-            }
-        },
-    },
-    'stats_outbound_clients': {
-        'key_properties': 'id',
-        'replication_method': 'INCREMENTAL',
-        'replication_key': 'date',
-        'bookmark': 'start_date',
-        'mapping': {
-            'date': {
-                'map': 'date',
-            },
-            'client_type': {
-                'map': 'client_type', 'null': False,
-            },
-            'count': {
-                'map': 'count', 'null': False,
-            },
-        },
-    },
-    'stats_outbound_platform': {
-        'key_properties': 'id',
-        'replication_method': 'INCREMENTAL',
-        'replication_key': 'date',
-        'bookmark': 'start_date',
-        'mapping': {
-            'id': {
-                'map': 'id', 'type': int, 'null': False,
-            },
-            'date': {
-                'map': 'date',
-            },
-            'Desktop': {
-                'map': 'desktop', 'type': int, 'null': True,
-            },
-            'Mobile': {
-                'map': 'mobile', 'type': int, 'null': True,
-            },
-            'Unknown': {
-                'map': 'unknown', 'type': int, 'null': True,
-            },
-            'WebMail': {
-                'map': 'webmail', 'type': int, 'null': True,
-            },
-        },
-    },
-    'stats_outbound_overview': {
-        'key_properties': 'id',
-        'replication_method': 'INCREMENTAL',
-        'replication_key': 'date',
-        'bookmark': 'start_date',
-        'mapping': {
-            'date': {
-                'map': 'date',
-            },
-            'id': {
-                'map': 'id', 'null': False,
-            },
-            'Sent': {
-                'map': 'sent', 'type': int, 'null': False,
-            },
-            'Bounced': {
-                'map': 'bounced', 'type': int, 'null': False,
-            },
-            'SMTPApiErrors': {
-                'map': 'smtp_api_errors', 'type': int, 'null': False,
-            },
-            'BounceRate': {
-                'map': 'bouncerate', 'null': False,
-            },
-            'SpamComplaints': {
-                'map': 'spamcomplaints', 'type': int, 'null': False,
-            },
-            'SpamComplaintsRate': {
-                'map': 'spamcomplaints_rate', 'null': False,
-            },
-            'Tracked': {
-                'map': 'tracked', 'type': int, 'null': False,
-            },
-            'Opens': {
-                'map': 'opens', 'type': int, 'null': False,
-            },
-            'UniqueOpens': {
-                'map': 'unique_opens', 'type': int, 'null': False,
-            },
-            'TotalClicks': {
-                'map': 'totalclicks', 'type': int, 'null': False,
-            },
-            'UniqueLinksClicked': {
-                'map': 'unique_linksclicked', 'type': int, 'null': False,
-            },
-            'WithClientRecorded': {
-                'map': 'with_client_recorded', 'type': int, 'null': False,
-            },
-            'WithPlatformRecorded': {
-                'map': 'with_platform_recorded', 'type': int, 'null': False,
-            },
-            'WithReadTimeRecorded': {
-                'map': 'with_readtime_recorded', 'type': int, 'null': False,
-            },
-            'WithLinkTracking': {
-                'map': 'with_linktracking', 'type': int, 'null': False,
-            },
-            'WithOpenTracking': {
-                'map': 'with_opentracking', 'type': int, 'null': False,
-            },
-            'TotalTrackedLinksSent': {
-                'map': 'total_tracked_links_sent', 'type': int, 'null': False,
-            }
-        },
     },
 })

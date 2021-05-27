@@ -107,12 +107,18 @@ def clean_trends(
     mapping: Optional[dict] = STREAMS['trends'].get(
         'mapping',
     )
-
-    df = pd.json_normalize(response_data, sep='_')
     
-    print(df)
+    # Create new cleaned Dict
+    cleaned_data: dict = {
+        'technology': response_data.get('Tech', {}).get('Name'),
+        'date': date_day,
+        'ten_k': response_data.get('Tech', {}).get('Coverage', {}).get('TenK'),
+        'hundred_k': response_data.get('Tech', {}).get('Coverage', {}).get('HundredK'),
+        'million': response_data.get('Tech', {}).get('Coverage', {}).get('Mil'),
+        'live': response_data.get('Tech', {}).get('Coverage', {}).get('Live'),
+    }
 
-
+    return clean_row(cleaned_data, mapping)
 
 # Collect all cleaners
 CLEANERS: MappingProxyType = MappingProxyType({

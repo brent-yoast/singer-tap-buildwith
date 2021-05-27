@@ -53,7 +53,7 @@ class Buildwith(object):  # noqa: WPS230
         if not start_date_input:
             raise ValueError('The parameter start_date is required.')
 
-        cleaner: Callable = CLEANERS.get('postmark_stats_outbound_bounces', {})
+        cleaner: Callable = CLEANERS.get('trends', {})
 
         self._set_api_key()
 
@@ -73,8 +73,7 @@ class Buildwith(object):  # noqa: WPS230
                 f'{API_SCHEME}{API_BASE_URL}{API_TRENDS}'
                 f'{self.api_key_url}{from_to_date}{tech}'
             )
-            
-            print(url)
+
 
             # Make a call to the Buildwith API
             response: httpx._models.Response = self.client.get(
@@ -88,10 +87,10 @@ class Buildwith(object):  # noqa: WPS230
             response_data: dict = response.json()
 
             self.logger.info(
-                f'{response_data}'
+                f'Streaming data from: {date_day}'
             )
 
-            # Yield Cleaned results
+            # Yield cleaned results
             yield cleaner(date_day, response_data)
 
     def _set_api_key(
