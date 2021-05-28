@@ -3,7 +3,7 @@
 
 import logging
 from datetime import date, datetime, timedelta
-from typing import Callable, Generator, List
+from typing import Callable, Generator, List, Union
 
 import httpx
 import singer
@@ -25,6 +25,7 @@ class Buildwith(object):  # noqa: WPS230
     def __init__(
         self,
         api_key: str,
+        technologies: Union[List[str], str]
     ) -> None:  # noqa: DAR101
         """Initialize client.
 
@@ -34,6 +35,12 @@ class Buildwith(object):  # noqa: WPS230
         self.api_key: str = api_key
         self.logger: logging.Logger = singer.get_logger()
         self.client: httpx.Client = httpx.Client(http2=True)
+        # Set plugin or plugins
+        if isinstance(technologies, str):
+            self.technologies = [technologies]
+        else:
+            self.technologies = technologies
+
 
     def trends(
         self,
@@ -50,6 +57,11 @@ class Buildwith(object):  # noqa: WPS230
         # Validate the start_date value exists
         start_date_input: str = str(kwargs.get('start_date', ''))
 
+        # Validate if technology name exists
+        self.logger.info(
+                f'Technology : {self.technologies}'
+            )
+
         if not start_date_input:
             raise ValueError('The parameter start_date is required.')
 
@@ -57,41 +69,43 @@ class Buildwith(object):  # noqa: WPS230
 
         self._set_api_key()
 
-        for date_day in self._start_days_till_yesterday(start_date_input):
-
-            # Replace placeholder in reports path
-            from_to_date: str = API_DATE.replace(
-                ':date:',
-                date_day,
-            )
-            # Replace placeholder in reports path
-            tech: str = API_TECH.replace(
+        for tech in self.technologies:
+        # Replace placeholder in reports path
+            api_tech: str = API_TECH.replace(
                 ':tech:',
-                'Yoast-WordPress-SEO-Plugin',
+                tech,
             )
-            url: str = (
-                f'{API_SCHEME}{API_BASE_URL}{API_TRENDS}'
-                f'{self.api_key_url}{from_to_date}{tech}'
-            )
+            for date_day in self._start_days_till_yesterday(start_date_input):
+
+                # Replace placeholder in reports path
+                from_to_date: str = API_DATE.replace(
+                    ':date:',
+                    date_day,
+                )
+                
+                url: str = (
+                    f'{API_SCHEME}{API_BASE_URL}{API_TRENDS}'
+                    f'{self.api_key_url}{from_to_date}{api_tech}'
+                )
 
 
-            # Make a call to the Buildwith API
-            response: httpx._models.Response = self.client.get(
-                url
-            )
+                # Make a call to the Buildwith API
+                response: httpx._models.Response = self.client.get(
+                    url
+                )
 
-            # Raise error on 4xx and 5xxx
-            response.raise_for_status()
+                # Raise error on 4xx and 5xxx
+                response.raise_for_status()
 
-            # Create dictionary from response
-            response_data: dict = response.json()
+                # Create dictionary from response
+                response_data: dict = response.json()
 
-            self.logger.info(
-                f'Streaming data from: {date_day}'
-            )
+                self.logger.info(
+                    f'Streaming {tech} trends data from: {date_day}'
+                )
 
-            # Yield cleaned results
-            yield cleaner(date_day, response_data)
+                # Yield cleaned results
+                yield cleaner(date_day, response_data, tech)
 
     def _set_api_key(
         self,

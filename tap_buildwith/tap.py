@@ -41,9 +41,10 @@ def main() -> None:
         # Loadt the  catalog
         catalog = discover()
 
-    # Initialize postmark client
+    # Initialize Builtwith client
     buildwith: Buildwith = Buildwith(
         args.config['api_key'],
+        args.config['technologies'],
     )
 
     sync(buildwith, args.state, catalog, args.config['start_date'])

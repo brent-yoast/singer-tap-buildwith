@@ -94,6 +94,7 @@ def clean_row(row: dict, mapping: dict) -> dict:
 def clean_trends(
     date_day: str,
     response_data: dict,
+    tech: str,
 ) -> dict:
     """Clean buildwith bounces response_data.
 
@@ -110,7 +111,7 @@ def clean_trends(
     
     # Create new cleaned Dict
     cleaned_data: dict = {
-        'technology': response_data.get('Tech', {}).get('Name'),
+        'technology': tech,
         'date': date_day,
         'ten_k': response_data.get('Tech', {}).get('Coverage', {}).get('TenK'),
         'hundred_k': response_data.get('Tech', {}).get('Coverage', {}).get('HundredK'),
